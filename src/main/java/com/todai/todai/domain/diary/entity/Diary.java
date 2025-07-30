@@ -4,6 +4,8 @@ import com.todai.todai.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.sql.Types;
 import java.time.LocalDate;
@@ -23,6 +25,7 @@ public class Diary {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @JdbcTypeCode(Types.ARRAY)
@@ -44,6 +47,4 @@ public class Diary {
 
     @Column(name="marking")
     private boolean marking;
-
-
 }

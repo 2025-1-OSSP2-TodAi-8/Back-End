@@ -10,15 +10,15 @@ public enum ErrorCode {
     /**
      * 400** Bad Request
      */
-    INVALID_REQUEST_PARAMETER("40000", HttpStatus.BAD_REQUEST, "Invalid request parameter provided."),
-    INVALID_REQUEST_BODY("40001", HttpStatus.BAD_REQUEST, "Invalid request body provided."),
-    INVALID_METHOD_ARGUMENT("40002", HttpStatus.BAD_REQUEST, "Invalid method argument provided."),
-    MISSING_REQUEST_PARAMETER("40003", HttpStatus.BAD_REQUEST, "Required parameter is missing."),
-    ARGUMENT_TYPE_MISMATCH("40004", HttpStatus.BAD_REQUEST, "Argument Type mismatch."),
-    MISSING_REQUEST_PART("40005", HttpStatus.BAD_REQUEST, "Missing request part."),
-    UNSUPPORTED_MEDIA_TYPE("40006", HttpStatus.BAD_REQUEST, "Unsupported Media Type."),
-    DUPLICATION_LOGIN_ID("40007", HttpStatus.BAD_REQUEST, "duplication of login id"),
-    INVALID_MAPPING_VALUE("40008", HttpStatus.BAD_REQUEST, "GPT매핑이 이루어지지 않았습니다"),
+    INVALID_REQUEST_PARAMETER("40000", HttpStatus.BAD_REQUEST, "잘못된 요청 파라미터입니다."),
+    INVALID_REQUEST_BODY     ("40001", HttpStatus.BAD_REQUEST, "잘못된 요청 본문입니다."),
+    INVALID_METHOD_ARGUMENT  ("40002", HttpStatus.BAD_REQUEST, "잘못된 메서드 인수입니다."),
+    MISSING_REQUEST_PARAMETER("40003", HttpStatus.BAD_REQUEST, "필수 요청 파라미터가 누락되었습니다."),
+    ARGUMENT_TYPE_MISMATCH   ("40004", HttpStatus.BAD_REQUEST, "파라미터 타입이 올바르지 않습니다."),
+    MISSING_REQUEST_PART     ("40005", HttpStatus.BAD_REQUEST, "요청 파트가 누락되었습니다."),
+    UNSUPPORTED_MEDIA_TYPE   ("40006", HttpStatus.BAD_REQUEST, "지원되지 않는 미디어 타입입니다."),
+    DUPLICATION_LOGIN_ID     ("40007", HttpStatus.BAD_REQUEST, "로그인 아이디가 중복되었습니다."),
+    INVALID_MAPPING_VALUE    ("40008", HttpStatus.BAD_REQUEST, "GPT 매핑이 이루어지지 않았습니다"),
 
 
 
@@ -51,15 +51,7 @@ public enum ErrorCode {
      */
     NOT_FOUND_END_POINT("40400", HttpStatus.NOT_FOUND, "존재하지 않는 엔드포인트입니다."),
     NOT_FOUND_USER("40401", HttpStatus.NOT_FOUND, "해당 사용자가 존재하지 않습니다."),
-    NOT_FOUND_AD("40402", HttpStatus.NOT_FOUND, "해당 광고가 존재하지 않습니다."),
-    NOT_FOUND_ADSLOT("40403", HttpStatus.NOT_FOUND, "해당 광고 자리가 존재하지 않습니다."),
-    NOT_FOUND_ADMIN("40404", HttpStatus.NOT_FOUND, "해당 매체사가 존재하지 않습니다."),
-    NOT_FOUND_CVINFO("40405", HttpStatus.NOT_FOUND, "해당 광고 정보가 존재하지 않습니다."),
-    NOT_FOUND_BIDHISTORY("40406", HttpStatus.NOT_FOUND, "해당 입찰 정보가 존재하지 않습니다."),
-    NOT_FOUND_ERD("40407",HttpStatus.NOT_FOUND, "팀에 해당하는 ERD가 존재하지 않습니다."),
-    NOT_FOUND_MEMBER("40408",HttpStatus.NOT_FOUND, "팀에 해당하는 멤버가 존재하지 않습니다."),
-    NOT_FOUND_TEAM("40409",HttpStatus.NOT_FOUND, "팀이 존재하지 않습니다."),
-    NOT_FOUND_ATTRIBUTE("40410", HttpStatus.NOT_FOUND, "존재하지 않는 속성"),
+    NOT_FOUND_DIARY("40402", HttpStatus.NOT_FOUND, "해당 조건에 해당하는 일기가 존재하지 않습니다"),
 
 
     /**
