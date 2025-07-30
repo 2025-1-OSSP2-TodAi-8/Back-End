@@ -16,7 +16,6 @@ import java.time.LocalDate;
 @Builder
 @Table(name="todai_user")
 public class User extends BaseTimeEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
