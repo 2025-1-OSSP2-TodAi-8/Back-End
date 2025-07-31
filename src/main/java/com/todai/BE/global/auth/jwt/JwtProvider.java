@@ -69,15 +69,15 @@ public class JwtProvider {
     }
 
     //토큰에서 userId 추출
-    public Long getUserIdFromToken(String token) {
-        return Long.parseLong(
-                Jwts.parserBuilder()
-                        .setSigningKey(secretKey)
-                        .build()
-                        .parseClaimsJws(token)
-                        .getBody()
-                        .getSubject()
-        );
-    }
+    public UUID getUserIdFromToken(String token) {
+        String subject = Jwts
+                    .parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();    // "3fa85f64-5717-4562-b3fc-2c963f66afa6" 같은 UUID 문자열
 
+        return UUID.fromString(subject);
+    }
 }
