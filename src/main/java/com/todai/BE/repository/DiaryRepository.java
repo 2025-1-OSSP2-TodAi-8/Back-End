@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface DiaryRepository extends JpaRepository<Diary, UUID> {
-    Optional<List<Diary>> findAllByUser_UserIdAndDateBetween(
+    List<Diary> findAllByUser_UserIdAndDateBetween(
             UUID userId,
             LocalDate start,
             LocalDate end
@@ -20,5 +20,9 @@ public interface DiaryRepository extends JpaRepository<Diary, UUID> {
 
     Optional<Diary> findByUser_UserId(UUID userId);
 
-    UUID user(User user);
+    List<Diary> findAllByUser_UserIdAndDateBetweenAndMarkingTrue(
+            UUID userId,
+            LocalDate start,
+            LocalDate end
+    );
 }

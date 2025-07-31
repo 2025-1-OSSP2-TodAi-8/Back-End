@@ -77,4 +77,31 @@ public class DiaryController {
                         "attachment; filename=\"" + filename + "\"")
                 .body(audio);
     }
+
+    @PatchMapping("/marking/{date}")
+    public CommonResponseDto<?> markDiary(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date
+    ) {
+        return CommonResponseDto.ok(diaryService.markDiary(user.getUserId(), date));
+    }
+
+    @GetMapping("/get_emotion_month/marked/{yearMonth}")
+    public CommonResponseDto<?> getMonthEmotionMarked(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable
+            @DateTimeFormat(pattern = "yyyy--MM") YearMonth yearMonth
+    ) {
+        return CommonResponseDto.ok(diaryService.getMonthEmotionYear(user.getUserId(), yearMonth));
+    }
+
+    @GetMapping("/get_emotion_year/marked/{year}")
+    public CommonResponseDto<?> getYearEmotionMarked(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable
+            @DateTimeFormat(pattern = "yyyy") Year year
+    ) {
+        return CommonResponseDto.ok(diaryService.getYearEmotionMarked(user.getUserId(), year));
+    }
 }

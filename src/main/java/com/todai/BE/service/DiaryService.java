@@ -40,28 +40,32 @@ public class DiaryService {
     @Autowired
     private AudioStorageService audioStorageService;
 
+    private String mapToLabel(List<Double> emotion) {
+        int idx = IntStream.range(0, emotion.size())
+                .reduce((i, j) -> emotion.get(i) >= emotion.get(j) ? i : j)
+                .orElse(0);
+
+        return switch (idx) {
+            case 0 -> "행복";
+            case 1 -> "슬픔";
+            case 2 -> "화남";
+            case 3 -> "놀람";
+            case 4 -> "공포";
+            case 5 -> "혐오";
+            default -> "알수없음";
+        };
+    }
+
     public List<EmotionsResponseDto> getMonthEmotion(UUID userId, YearMonth yearMonth) {
         LocalDate start = yearMonth.atDay(1);
         LocalDate end   = yearMonth.atEndOfMonth();
 
-        List<Diary> diaries = diaryRepository.findAllByUser_UserIdAndDateBetween(userId, start, end).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DIARY));
+        List<Diary> diaries = diaryRepository.findAllByUser_UserIdAndDateBetween(userId, start, end);
 
         return diaries.stream()
                 .map(diary -> {
                     List<Double> em = diary.getEmotion();
-                    int maxIdx = IntStream.range(0, em.size())
-                            .reduce((i, j) -> em.get(i) >= em.get(j) ? i : j)
-                            .orElse(0);
-                    String label;
-                    switch (maxIdx) {
-                        case 0: label = "행복"; break;
-                        case 1: label = "슬픔"; break;
-                        case 2: label = "화남"; break;
-                        case 3: label = "놀람"; break;
-                        case 4: label = "공포"; break;
-                        case 5: label = "혐오"; break;
-                        default: label = "알수없음";
-                    }
+                    String label = mapToLabel(em);
                     return new EmotionsResponseDto(
                             diary.getDate().toString(),
                             label
@@ -73,7 +77,7 @@ public class DiaryService {
     public List<EmotionsResponseDto> getYearEmotion(UUID userId, Year year) {
         LocalDate start = year.atDay(1);
         LocalDate end = year.atMonth(12).atEndOfMonth();
-        List<Diary> diaries = diaryRepository.findAllByUser_UserIdAndDateBetween(userId, start, end).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DIARY));
+        List<Diary> diaries = diaryRepository.findAllByUser_UserIdAndDateBetween(userId, start, end);
 
         return diaries.stream()
                 .map(diary -> {
@@ -94,7 +98,7 @@ public class DiaryService {
 
         String label = mapToLabel(emotion);
 
-        return new EmotionResponseDto(label, emotion, diary.getSummary());
+        return new EmotionResponseDto(label, emotion, diary.getSummary(), diary.isMarking());
     }
 
     public EmotionResponseDto recordDiary(UUID userId, CreateDiaryDto diaryDto) {
@@ -131,23 +135,7 @@ public class DiaryService {
 
         String label = mapToLabel(saved.getEmotion());
 
-        return new EmotionResponseDto(label, saved.getEmotion(), saved.getSummary());
-    }
-
-    private String mapToLabel(List<Double> emotion) {
-        int idx = IntStream.range(0, emotion.size())
-                .reduce((i, j) -> emotion.get(i) >= emotion.get(j) ? i : j)
-                .orElse(0);
-
-        return switch (idx) {
-            case 0 -> "행복";
-            case 1 -> "슬픔";
-            case 2 -> "화남";
-            case 3 -> "놀람";
-            case 4 -> "공포";
-            case 5 -> "혐오";
-            default -> "알수없음";
-        };
+        return new EmotionResponseDto(label, saved.getEmotion(), saved.getSummary(), saved.isMarking());
     }
 
     public Resource getAudio(UUID userId, LocalDate date) {
@@ -172,4 +160,51 @@ public class DiaryService {
             throw new CustomException(ErrorCode.SERVER_ERROR_FILE_READ);
         }
     }
+
+    public EmotionResponseDto markDiary(UUID userId, LocalDate date) {
+        Diary diary = diaryRepository.findByUser_UserIdAndDate(userId, date).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DIARY));
+        diary.setMarking(!diary.isMarking());
+        Diary saved = diaryRepository.save(diary);
+        String label = mapToLabel(saved.getEmotion());
+
+        return new EmotionResponseDto(label, saved.getEmotion(), saved.getSummary(), saved.isMarking());
+    }
+
+    public List<EmotionsResponseDto> getMonthEmotionYear(UUID userId, YearMonth yearMonth) {
+        LocalDate start = yearMonth.atDay(1);
+        LocalDate end   = yearMonth.atEndOfMonth();
+
+        List<Diary> diaries = diaryRepository.findAllByUser_UserIdAndDateBetweenAndMarkingTrue(userId, start, end);
+
+        return diaries.stream()
+                .map(diary -> {
+                    List<Double> em = diary.getEmotion();
+                    String label = mapToLabel(em);
+                    return new EmotionsResponseDto(
+                            diary.getDate().toString(),
+                            label
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<EmotionsResponseDto> getYearEmotionMarked(UUID userId, Year year) {
+        LocalDate start = year.atDay(1);
+        LocalDate end = year.atMonth(12).atEndOfMonth();
+        List<Diary> diaries = diaryRepository.findAllByUser_UserIdAndDateBetweenAndMarkingTrue(userId, start, end);
+
+        return diaries.stream()
+                .map(diary -> {
+                    List<Double> emotion = diary.getEmotion();
+                    String label = mapToLabel(emotion);
+
+                    return new EmotionsResponseDto(
+                            diary.getDate().toString(),
+                            label
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
+
 }
