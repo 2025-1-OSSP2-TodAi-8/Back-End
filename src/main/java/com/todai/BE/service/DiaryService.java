@@ -11,11 +11,15 @@ import com.todai.BE.common.exception.ErrorCode;
 import com.todai.BE.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Year;
@@ -144,5 +148,28 @@ public class DiaryService {
             case 5 -> "혐오";
             default -> "알수없음";
         };
+    }
+
+    public Resource getAudio(UUID userId, LocalDate date) {
+        Diary diary = diaryRepository
+                .findByUser_UserIdAndDate(userId, date)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DIARY));
+
+        String audioPath = diary.getAudioPath();
+        if (audioPath == null || audioPath.isBlank()) {
+            throw new CustomException(ErrorCode.NOT_FOUND_AUDIO);
+        }
+
+        try {
+            Path file = Paths.get(audioPath);
+            Resource resource = new UrlResource(file.toUri());
+            if (resource.exists() && resource.isReadable()) {
+                return resource;
+            } else {
+                throw new CustomException(ErrorCode.NOT_FOUND_AUDIO);
+            }
+        } catch (MalformedURLException e) {
+            throw new CustomException(ErrorCode.SERVER_ERROR_FILE_READ);
+        }
     }
 }

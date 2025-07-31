@@ -52,6 +52,7 @@ public enum ErrorCode {
     NOT_FOUND_END_POINT("40400", HttpStatus.NOT_FOUND, "존재하지 않는 엔드포인트입니다."),
     NOT_FOUND_USER("40401", HttpStatus.NOT_FOUND, "해당 사용자가 존재하지 않습니다."),
     NOT_FOUND_DIARY("40402", HttpStatus.NOT_FOUND, "해당 조건에 해당하는 일기가 존재하지 않습니다"),
+    NOT_FOUND_AUDIO("40403", HttpStatus.NOT_FOUND, "해당 일기의 음성파일이 존재하지 않습니다"),
 
 
     /**
@@ -73,7 +74,8 @@ public enum ErrorCode {
     SERVER_ERROR("50000", HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
     SERVER_ERROR_INIT_FILE("50101", HttpStatus.INTERNAL_SERVER_ERROR, "초기 파일 저장 오류"),
     SERVER_ERROR_FILE_SAVE("50102", HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장 오류"),
-    SERVER_ERROR_DELETE_FILE("50102", HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제 오류");
+    SERVER_ERROR_DELETE_FILE("50102", HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제 오류"),
+    SERVER_ERROR_FILE_READ("50103", HttpStatus.INTERNAL_SERVER_ERROR, "문자열 파싱 오류");
 
     private final String code;
     private final HttpStatus httpStatus;
