@@ -2,6 +2,7 @@ package com.todai.BE.dto.request.diary;
 
 import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -21,6 +22,7 @@ public record CreateDiaryDto(
         @Size(max = 2000, message = "summary는 최대 2000자 이하로 작성 가능합니다.")
         String summary,
 
+        @RequestPart("audioFile")
         MultipartFile audioFile
 ) {
 }

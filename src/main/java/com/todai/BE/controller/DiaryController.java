@@ -1,10 +1,12 @@
 package com.todai.BE.controller;
 
+import com.todai.BE.dto.request.diary.CreateDiaryDto;
 import com.todai.BE.service.DiaryService;
 import com.todai.BE.common.dto.CommonResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import com.todai.BE.security.CustomUserDetails;
@@ -44,11 +46,11 @@ public class DiaryController {
         return CommonResponseDto.ok(diaryService.getDayEmotion(user.getUserId(), date));
     }
 
-//    @PostMapping("/diary/record")
-//    public CommonResponseDto<?> recordDiary(
-//            @AuthenticationPrincipal CustomUserDetails user,
-//            @RequestBody CreateDiaryDto diaryDto
-//    ){
-//        return CommonResponseDto.ok(diaryService.recordDiary(user.getUserId(), diaryDto));
-//    }
+    @PostMapping(value = "/record", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public CommonResponseDto<?> recordDiary(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @ModelAttribute CreateDiaryDto diaryDto
+    ){
+        return CommonResponseDto.ok(diaryService.recordDiary(user.getUserId(), diaryDto));
+    }
 }

@@ -71,8 +71,10 @@ public enum ErrorCode {
      * 500** Server Error
      */
     SERVER_ERROR("50000", HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
-    SMS_SEND_FAIL("50102", HttpStatus.INTERNAL_SERVER_ERROR, "메세지 전송 실패"),
-    EXTERNAL_SERVER_ERROR("50101", HttpStatus.INTERNAL_SERVER_ERROR, "서버 외부 오류");
+    SERVER_ERROR_INIT_FILE("50101", HttpStatus.INTERNAL_SERVER_ERROR, "초기 파일 저장 오류"),
+    SERVER_ERROR_FILE_SAVE("50102", HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장 오류"),
+    SERVER_ERROR_DELETE_FILE("50102", HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제 오류");
+
     private final String code;
     private final HttpStatus httpStatus;
     private final String message;
