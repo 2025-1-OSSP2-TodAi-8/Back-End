@@ -21,6 +21,6 @@ spring:
 
 
 jwt:
-  secret: my-super-secret-key-for-jwt-encoding-1234567890
+  secret: ${JWT_SECRET}
   access-token-expire-time: 3600000
   refresh-token-expire-time: 604800000
