@@ -40,4 +40,7 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private Gender gender;
 
+    @Column(nullable = false, unique = true)
+    private String email;
+
 }
