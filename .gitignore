@@ -38,3 +38,4 @@ out/
 
 ### gitignore ###
 src/main/resources/application.yml
+uploads/

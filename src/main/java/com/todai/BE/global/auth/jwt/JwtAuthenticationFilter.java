@@ -13,6 +13,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.UUID;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 2. 토큰 유효성 검사
                 if (jwtProvider.validateToken(token)) {
                     // 3. 토큰에서 사용자 ID 추출
-                    Long userId = jwtProvider.getUserIdFromToken(token);
+                    UUID userId = jwtProvider.getUserIdFromToken(token);
 
                     // 4. DB에서 사용자 조회
                     User user = userRepository.findById(userId)
