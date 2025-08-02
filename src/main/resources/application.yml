@@ -7,9 +7,9 @@ spring:
       max-request-size: 100MB
 
   datasource:
-    url: jdbc:postgresql://svc.sel4.cloudtype.app:32086/todai
-    username: todai_admin
-    password: 1q2w3e4r
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${1q2w3e4r}
 
   jpa:
     hibernate:
