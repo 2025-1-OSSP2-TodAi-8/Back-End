@@ -19,11 +19,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/api/test")
-    public String hello() {
-        return "Hello, Authenticated User!";
-    }
-
     @GetMapping("/my")
     public CommonResponseDto<?> getMyPageInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
         UUID userId = userDetails.getUserId();

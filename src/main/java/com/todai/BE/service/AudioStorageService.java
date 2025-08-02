@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.IIOException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.*;
@@ -42,6 +41,8 @@ public class AudioStorageService {
         Path userDir = rootLocation
                 .resolve(userId.toString())
                 .resolve(date.toString());
+
+        System.out.println(userDir.toString());
 
         try {
             Files.createDirectories(userDir);
