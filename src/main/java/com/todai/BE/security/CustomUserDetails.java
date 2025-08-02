@@ -11,6 +11,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor //final 필드를 초기화하는 생성자 자동 생성.
 public class CustomUserDetails implements UserDetails {
+
     private final User user;
     /* 생성자 ( @RequiredArgsConstructor 있으면 안써도됨)
     public CustomUserDetails(User user) {
@@ -54,11 +55,11 @@ public class CustomUserDetails implements UserDetails {
     }
 
     //
-    public UUID getUserId() {
-        return user.getUserId();  // JWT에 담거나 조회용으로 사용 가능
+    public UUID getUserId() {  // JWT에 담거나 조회용으로 사용 가능
+        return user.getUserId();
     }
 
-    public User getUser() {
-        return user;  // 전체 유저 객체 접근 필요 시
+    public User getUser() { // 전체 유저 객체 접근 필요 시
+        return user;
     }
 }

@@ -20,6 +20,8 @@ public enum ErrorCode {
     DUPLICATION_LOGIN_ID     ("40007", HttpStatus.BAD_REQUEST, "로그인 아이디가 중복되었습니다."),
     INVALID_MAPPING_VALUE    ("40008", HttpStatus.BAD_REQUEST, "GPT 매핑이 이루어지지 않았습니다"),
 
+    DUPLICATION_EMAIL("40009", HttpStatus.BAD_REQUEST, "이메일이 중복되었습니다."),
+
 
 
     /**

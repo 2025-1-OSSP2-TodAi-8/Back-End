@@ -23,7 +23,12 @@ public class AuthService {
 
     public void signUp(SignUpRequestDTO requestDTO) {
         if (userRepository.findByUsername(requestDTO.username()).isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 username입니다.");
+            throw new CustomException(ErrorCode.DUPLICATION_LOGIN_ID);
+        }
+
+        // email 중복 검사
+        if (userRepository.findByEmail(requestDTO.email()).isPresent()) {
+            throw new CustomException(ErrorCode.DUPLICATION_EMAIL);
         }
 
         User user = User.builder()
@@ -33,6 +38,7 @@ public class AuthService {
                 .birthdate(requestDTO.birthdate())
                 .gender(requestDTO.gender())
                 .userType(requestDTO.userType())
+                .email(requestDTO.email())
                 .build();
         userRepository.save(user);
     }
@@ -42,7 +48,7 @@ public class AuthService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         if (!passwordEncoder.matches(requestDTO.password(), user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
         String accessToken = jwtProvider.generateAccessToken(user.getUserId());
