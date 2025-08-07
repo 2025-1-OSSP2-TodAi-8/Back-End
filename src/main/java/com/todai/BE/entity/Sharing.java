@@ -1,5 +1,6 @@
 package com.todai.BE.entity;
 
+import com.todai.BE.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 
-public class Sharing {
+public class Sharing extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID sharingId;
@@ -39,4 +40,13 @@ public class Sharing {
     @Enumerated(EnumType.STRING)
     @Column(name = "share_state", nullable = false)
     private ShareState shareState = ShareState.UNMATCHED;
+
+    //DB 업데이트용 메소드
+    public void accept() {
+        this.shareState = ShareState.MATCHED;
+    }
+
+    public void reject() {
+        this.shareState = ShareState.REJECTED;
+    }
 }
