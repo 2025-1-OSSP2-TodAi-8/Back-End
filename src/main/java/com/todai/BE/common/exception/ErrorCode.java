@@ -21,6 +21,14 @@ public enum ErrorCode {
     INVALID_MAPPING_VALUE    ("40008", HttpStatus.BAD_REQUEST, "GPT 매핑이 이루어지지 않았습니다"),
 
     DUPLICATION_EMAIL("40009", HttpStatus.BAD_REQUEST, "이메일이 중복되었습니다."),
+    ALREADY_REQUESTED_SHARING("40010", HttpStatus.BAD_REQUEST, "이미 연동 요청을 보냈습니다."),
+    ALREADY_MATCHED_SHARING("40011", HttpStatus.BAD_REQUEST, "이미 연동이 완료된 사용자입니다."),
+
+
+    ALREADY_ACCEPTED_SHARING("40012", HttpStatus.BAD_REQUEST, "해당 연동 요청은 이미 수락되었습니다."),
+    ALREADY_REJECTED_SHARING("40013", HttpStatus.BAD_REQUEST, "해당 연동 요청은 이미 거절되었습니다."),
+
+
 
 
 
@@ -56,6 +64,7 @@ public enum ErrorCode {
     NOT_FOUND_DIARY("40402", HttpStatus.NOT_FOUND, "해당 조건에 해당하는 일기가 존재하지 않습니다"),
     NOT_FOUND_AUDIO("40403", HttpStatus.NOT_FOUND, "해당 일기의 음성파일이 존재하지 않습니다"),
 
+    NOT_FOUND_SHARING("40404", HttpStatus.NOT_FOUND, "해당 연동 요청이 존재하지 않습니다."),
 
     /**
      * 405** Method Not Allowed

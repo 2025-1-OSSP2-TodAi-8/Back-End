@@ -21,6 +21,10 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID userId;
 
+    //공유코드
+    @Column(unique = true, length = 8)
+    private String shareCode;  //유저 검색에 쓰일 공유 식별 코드 (8자리)
+
     @Column(nullable = false, unique = true)
     private String username;
 
