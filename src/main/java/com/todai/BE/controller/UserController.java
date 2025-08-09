@@ -34,12 +34,12 @@ public class UserController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody SearchUserRequestDTO request
     ) {
-        String username = request.username();
-        SearchUserResponseDTO response = userService.searchUser(username);
+        String userCode = request.userCode();
+        SearchUserResponseDTO response = userService.searchUser(userCode);
         return CommonResponseDto.ok(response);
     }
 
-    @PostMapping("/sharing/request")
+    /*@PostMapping("/sharing/request")
     public CommonResponseDto<?> sendSharingRequest(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody SearchUserRequestDTO requestDTO
@@ -50,7 +50,7 @@ public class UserController {
         );
 
         return CommonResponseDto.ok(response);
-    }
+    }*/
 
     /*@PostMapping("/action")
     public CommonResponseDto<?> handleSharingAction(

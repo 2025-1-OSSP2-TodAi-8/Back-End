@@ -2,16 +2,15 @@ package com.todai.BE.dto.response.user;
 
 import com.todai.BE.entity.User;
 
+import java.time.LocalDate;
+
 public record SearchUserResponseDTO (
         boolean exists,
         String name,
-        String foundUsername
+        LocalDate birthdate
 ){
     public static SearchUserResponseDTO from(User user) {
-        return new SearchUserResponseDTO(true, user.getName(), user.getUsername());
+        return new SearchUserResponseDTO(true, user.getName(), user.getBirthdate());
     }
 
-    public static SearchUserResponseDTO notFound() {
-        return new SearchUserResponseDTO(false, null, null);
-    }
 }

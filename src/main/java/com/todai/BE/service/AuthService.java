@@ -22,12 +22,12 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
-    private String generateShareCode(){
+    private String generateUserCode(){
         String code;
 
         do{
             code = UUID.randomUUID().toString().substring(0, 8);
-        }while (userRepository.existsByShareCode(code));
+        }while (userRepository.existsByUserCode(code));
 
         return code;
     }
@@ -43,8 +43,8 @@ public class AuthService {
             throw new CustomException(ErrorCode.DUPLICATION_EMAIL);
         }
 
-        //공유코드 생성
-        String sharecode = generateShareCode();
+        //유저 공유코드 생성
+        String userCode = generateUserCode();
 
         User user = User.builder()
                 .username(requestDTO.username())
@@ -54,7 +54,7 @@ public class AuthService {
                 .gender(requestDTO.gender())
                 .userType(requestDTO.userType())
                 .email(requestDTO.email())
-                .shareCode(sharecode)
+                .userCode(userCode)
                 .build();
         userRepository.save(user);
     }
