@@ -40,19 +40,15 @@ public class UserService {
             notificationList.add(SharingWaitingDTO.from(sharing));
         }
 
-        return MyPageResponseDTO.of(user.getShareCode(), user.getName(), sharingInfoList, notificationList);
+        return MyPageResponseDTO.of(user.getUserCode(), user.getName(), sharingInfoList, notificationList);
     }
 
     //사용자 유저네임(영문 아이디) 검색 메소드
-    public SearchUserResponseDTO searchUser(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
+    public SearchUserResponseDTO searchUser(String userCode) {
+        User user = userRepository.findByUserCode(userCode)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        if (user.isPresent()) {
-            return SearchUserResponseDTO.from(user.get());
-        } else {
-            return SearchUserResponseDTO.notFound();
-        }
-
+        return SearchUserResponseDTO.from(user);
     }
 
     //보호자 -> 사용자 연동 요청 메소드
