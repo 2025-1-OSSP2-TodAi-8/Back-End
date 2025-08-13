@@ -99,8 +99,4 @@ public class GuardianService {
                 emotionList.size()
         );
     }
-
-    public
-
-
 }
