@@ -2,6 +2,7 @@ package com.todai.BE.service;
 
 import com.todai.BE.common.exception.CustomException;
 import com.todai.BE.common.exception.ErrorCode;
+import com.todai.BE.dto.request.user.UpdateShowRangeRequestDTO;
 import com.todai.BE.dto.response.user.*;
 import com.todai.BE.entity.ShareRange;
 import com.todai.BE.entity.ShareState;
@@ -17,11 +18,13 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
 
     private final SharingRepository sharingRepository;
     private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public MyPageResponseDTO getMyPageInfo(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
@@ -52,17 +55,20 @@ public class UserService {
     }
 
     //보호자 -> 사용자 연동 요청 메소드
-    public SharingResponseDTO handleSharingRequest(UUID requesterId, String targetUsername) {
+    @Transactional
+    public void sendSharingRequest(UUID requesterId, String targetUserCode) {
         User requester = userRepository.findById(requesterId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        User target = userRepository.findByUsername(targetUsername)
+        User target = userRepository.findByUserCode(targetUserCode) //유저코드로 타겟 사용자 검색
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
+        //이미 요청해서 수락 대기중인 경우
         if (sharingRepository.existsByOwnerAndSharedWithAndShareState(target, requester, ShareState.UNMATCHED)) {
             throw new CustomException(ErrorCode.ALREADY_REQUESTED_SHARING);
         }
 
+        //이미 연동 완료된 경우
         if (sharingRepository.existsByOwnerAndSharedWithAndShareState(target, requester, ShareState.MATCHED)) {
             throw new CustomException(ErrorCode.ALREADY_MATCHED_SHARING);
         }
@@ -75,13 +81,12 @@ public class UserService {
                 .build();
 
         sharingRepository.save(sharing);
-
-        return SharingResponseDTO.from(target.getUserId());
+        //return SharingResponseDTO.from(target.getUserId());
     }
 
     //연동 요청 수락/거절 메소드
-    /*@Transactional
-    public HandleSharingResponseDTO handleSharingAction(UUID userId, Long sharingId, String action) {
+    @Transactional
+    public HandleSharingResponseDTO handleSharingAction(UUID userId, UUID sharingId, String action) {
         if (!action.equals("accept") && !action.equals("reject")) {
             throw new CustomException(ErrorCode.INVALID_REQUEST_PARAMETER);
         }
@@ -89,7 +94,8 @@ public class UserService {
         //사용자 조회
         User owner = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-        Sharing sharing = sharingRepository.findByIdAndOwner(sharingId, owner)
+        //해당 사용자가 owner이고 sharingId가 일치하는 데이터 찾기
+        Sharing sharing = sharingRepository.findByOwnerAndSharingId(owner, sharingId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_SHARING));
 
 
@@ -101,6 +107,7 @@ public class UserService {
                 throw new CustomException(ErrorCode.ALREADY_REJECTED_SHARING);
             }
         }
+
         //상태가 UNMATCHED 인 경우
         else {
             if (action.equals("accept")) {
@@ -111,8 +118,24 @@ public class UserService {
 
             return HandleSharingResponseDTO.of("연동 요청이 " + action + "되었습니다.");
         }
-    }*/
+    }
 
+    //공개범위 수정
+    public UpdateShowRangeResponseDTO updateShowRange(UUID userId, UpdateShowRangeRequestDTO requestDTO) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        User guardian = userRepository.findById(requestDTO.guardianId())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_GUARDAIN));
+
+        Sharing sharing = sharingRepository.findByOwnerAndSharedWith(user, guardian)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_SHARING));
+
+        sharing.updateShareRange(requestDTO.showRange());
+
+        return new UpdateShowRangeResponseDTO(guardian.getUserId(), sharing.getShareRange());
+
+    }
 
 
 
