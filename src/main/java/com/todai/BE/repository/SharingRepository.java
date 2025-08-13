@@ -16,4 +16,12 @@ public interface SharingRepository extends JpaRepository<Sharing, UUID> {
     //Optional<Sharing> findByIdAndOwnerAndShareState(Long id, User owner, ShareState shareState);
     //Optional<Sharing> findByIdAndOwner(Long id, User owner);
 
+    Optional<Sharing> findByOwnerAndSharingId(User owner, UUID sharingId);
+    Optional<Sharing> findByOwnerAndSharedWith(User owner, User sharedWith);
+
+    Optional<Sharing> findByOwner_UserIdAndSharedWith_UserIdAndShareState(
+            UUID ownerId,
+            UUID sharedWithId,
+            ShareState shareState
+    );
 }

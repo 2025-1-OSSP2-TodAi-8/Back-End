@@ -41,12 +41,18 @@ public class Sharing extends BaseTimeEntity {
     @Column(name = "share_state", nullable = false)
     private ShareState shareState = ShareState.UNMATCHED;
 
+
     //DB 업데이트용 메소드
     public void accept() {
         this.shareState = ShareState.MATCHED;
     }
 
     public void reject() {
+
         this.shareState = ShareState.REJECTED;
+    }
+
+    public void updateShareRange(ShareRange newShareRange) {
+        this.shareRange = newShareRange;
     }
 }

@@ -65,6 +65,8 @@ public enum ErrorCode {
     NOT_FOUND_AUDIO("40403", HttpStatus.NOT_FOUND, "해당 일기의 음성파일이 존재하지 않습니다"),
 
     NOT_FOUND_SHARING("40404", HttpStatus.NOT_FOUND, "해당 연동 요청이 존재하지 않습니다."),
+    NOT_FOUND_GUARDAIN("40405", HttpStatus.NOT_FOUND ,"해당 보호자와 연동 관계가 존재하지 않습니다." ),
+    NOT_FOUND_TARGET("40406", HttpStatus.NOT_FOUND, "타겟 사용자가 존재하지 않습니다."),
 
     /**
      * 405** Method Not Allowed

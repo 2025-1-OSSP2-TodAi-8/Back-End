@@ -1,7 +1,11 @@
 package com.todai.BE.dto.request.user;
 
+import com.todai.BE.entity.ShareState;
+
+import java.util.UUID;
+
 public record HandleSharingRequestDTO(
-        Long sharingId,
+        UUID sharingId,
         String action
 ) {
 }
