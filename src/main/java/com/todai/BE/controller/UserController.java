@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.UUID;
@@ -113,5 +114,13 @@ public class UserController {
     }
 
     @PostMapping("/sharing/{yearMonth}/{emotion_index}")
-    public CommonResponseDto<?> getTarget
+    public CommonResponseDto<?> getTargetEmotionSummary(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable("yearMonth")
+            @DateTimeFormat(pattern = "yyyy-MM")YearMonth yearMonth,
+            @PathVariable("emotion_index")Long emotionIndex,
+            @RequestBody TargetEmotionRequestDTO requestDTO
+            ) {
+        return CommonResponseDto.ok(guardianService.getTargetEmotionSummary(user.getUserId(), yearMonth, emotionIndex, requestDTO));
+    }
 }
