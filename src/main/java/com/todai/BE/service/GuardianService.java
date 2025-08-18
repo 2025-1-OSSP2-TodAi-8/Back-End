@@ -3,6 +3,7 @@ package com.todai.BE.service;
 import com.todai.BE.common.exception.CustomException;
 import com.todai.BE.common.exception.ErrorCode;
 import com.todai.BE.dto.request.user.TargetEmotionRequestDTO;
+import com.todai.BE.dto.response.diary.EmotionResponseDto;
 import com.todai.BE.dto.response.diary.EmotionsResponseDto;
 import com.todai.BE.dto.response.user.TargetEmotionsResponseDTO;
 import com.todai.BE.entity.Diary;
@@ -98,5 +99,26 @@ public class GuardianService {
                 happy, sadness, anger, surprise, fear, disgust, unknown,
                 emotionList.size()
         );
+    }
+
+    public EmotionResponseDto getTargetDayEmotion(UUID userId, LocalDate date, TargetEmotionRequestDTO requestDTO) {
+        //타겟 사용자 아이디
+        UUID targetId = requestDTO.targetId();
+
+        //타겟 유저 존재 여부 검증
+        User owner = userRepository.findById(targetId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_TARGET));
+
+        //연동 관계 존재 여부 검증
+        Sharing sharing = sharingRepository.findByOwner_UserIdAndSharedWith_UserIdAndShareState(targetId, userId, ShareState.MATCHED)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_SHARING));
+
+        Diary diary = diaryRepository.findByUser_UserIdAndDate(targetId, date).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DIARY));
+        List<Double> emotion = diary.getEmotion();
+
+
+        String label = mapToLabel(emotion);
+
+        return new EmotionResponseDto(label, emotion, diary.getSummary(), diary.isMarking());
     }
 }

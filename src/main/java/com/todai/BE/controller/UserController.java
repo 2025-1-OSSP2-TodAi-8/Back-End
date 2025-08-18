@@ -15,6 +15,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.UUID;
@@ -101,9 +102,16 @@ public class UserController {
     }
 
 
+    @PostMapping("/sharing/{date}")
+    public CommonResponseDto<?> getTargetDayEmotion(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable("date")
+            @DateTimeFormat(pattern = "yyyy-MM-dd")LocalDate date,
+            @RequestBody TargetEmotionRequestDTO requestDTO
+            ) {
+        return CommonResponseDto.ok(guardianService.getTargetDayEmotion(user.getUserId(), date, requestDTO));
+    }
 
-
-
-
-
+    @PostMapping("/sharing/{yearMonth}/{emotion_index}")
+    public CommonResponseDto<?> getTarget
 }
