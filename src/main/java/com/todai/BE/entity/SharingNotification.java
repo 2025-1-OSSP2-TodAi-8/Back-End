@@ -19,6 +19,7 @@ public class SharingNotification extends BaseTimeEntity {
     @Column(name = "sharing_notification_id", nullable = false)
     private UUID id;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "state")
     private ShareState state; //matched(accept) 또는 rejected(reject)
 
