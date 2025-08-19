@@ -5,6 +5,7 @@ import com.todai.BE.common.exception.ErrorCode;
 import com.todai.BE.dto.request.user.UpdateShowRangeRequestDTO;
 import com.todai.BE.dto.response.user.*;
 import com.todai.BE.entity.*;
+import com.todai.BE.repository.MessageRepository;
 import com.todai.BE.repository.SharingNotificationRepository;
 import com.todai.BE.repository.SharingRepository;
 import com.todai.BE.repository.UserRepository;
@@ -22,6 +23,7 @@ public class UserService {
     private final SharingRepository sharingRepository;
     private final UserRepository userRepository;
     private final SharingNotificationRepository sharingNotificationRepository;
+    private final MessageRepository messageRepository;
 
     @Transactional(readOnly = true)
     public MyPageResponseDTO getMyPageInfo(UUID userId) {
@@ -42,45 +44,16 @@ public class UserService {
             notificationList.add(SharingWaitingDTO.from(sharing));
         }
 
-        return MyPageResponseDTO.of(user.getUserCode(), user.getName(), sharingInfoList, notificationList);
-    }
-
-    //사용자 유저네임(영문 아이디) 검색 메소드
-    public SearchUserResponseDTO searchUser(String userCode) {
-        User user = userRepository.findByUserCode(userCode)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-
-        return SearchUserResponseDTO.from(user);
-    }
-
-    //보호자 -> 사용자 연동 요청 메소드
-    @Transactional
-    public void sendSharingRequest(UUID requesterId, String targetUserCode) {
-        User requester = userRepository.findById(requesterId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-
-        User target = userRepository.findByUserCode(targetUserCode) //유저코드로 타겟 사용자 검색
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-
-        //이미 요청해서 수락 대기중인 경우
-        if (sharingRepository.existsByOwnerAndSharedWithAndShareState(target, requester, ShareState.UNMATCHED)) {
-            throw new CustomException(ErrorCode.ALREADY_REQUESTED_SHARING);
+        // 메세지 데이터들
+        List<Message> allMessages = messageRepository.findBySharing_Owner(user);
+        List<MessageInfoDTO> messages = new ArrayList<>();
+        for (Message message : allMessages) {
+            String guardianName = message.getSharing().getSharedWith().getName();
+            boolean is_read = message.getIsRead();
+            messages.add(new MessageInfoDTO(message.getId(), guardianName, is_read));
         }
 
-        //이미 연동 완료된 경우
-        if (sharingRepository.existsByOwnerAndSharedWithAndShareState(target, requester, ShareState.MATCHED)) {
-            throw new CustomException(ErrorCode.ALREADY_MATCHED_SHARING);
-        }
-
-        Sharing sharing = Sharing.builder()
-                .owner(target)
-                .sharedWith(requester)
-                .shareRange(ShareRange.PARTIAL) // 기본값
-                .shareState(ShareState.UNMATCHED)
-                .build();
-
-        sharingRepository.save(sharing);
-        //return SharingResponseDTO.from(target.getUserId());
+        return MyPageResponseDTO.of(user.getUserCode(), user.getName(), sharingInfoList, notificationList, messages);
     }
 
     //연동 요청 수락/거절 메소드
@@ -96,7 +69,6 @@ public class UserService {
         //해당 사용자가 owner이고 sharingId가 일치하는 데이터 찾기
         Sharing sharing = sharingRepository.findByOwnerAndSharingId(owner, sharingId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_SHARING));
-
 
         // 상태가 UNMATCHED가 아닐 경우 -> 상태에 따라 다른 에러코드 반환
         if (sharing.getShareState() != ShareState.UNMATCHED) {
@@ -130,6 +102,7 @@ public class UserService {
     }
 
     //공개범위 수정
+    @Transactional
     public UpdateShowRangeResponseDTO updateShowRange(UUID userId, UpdateShowRangeRequestDTO requestDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
@@ -144,6 +117,23 @@ public class UserService {
 
         return new UpdateShowRangeResponseDTO(guardian.getUserId(), sharing.getShareRange());
 
+    }
+
+    //메세지 단일조회
+    @Transactional
+    public GetMessageResponseDTO getMessage(UUID userId, UUID messageId) {
+        User receiver = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        Message message = messageRepository.findByIdAndSharing_Owner(messageId, receiver)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MESSAGE));
+
+        // 메시지 읽음 처리
+        if (!message.getIsRead()) {
+            message.updateTrue();
+        }
+
+        return GetMessageResponseDTO.from(message);
     }
 
 

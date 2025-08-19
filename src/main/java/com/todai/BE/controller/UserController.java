@@ -1,10 +1,7 @@
 package com.todai.BE.controller;
 
 import com.todai.BE.common.dto.CommonResponseDto;
-import com.todai.BE.dto.request.user.HandleSharingRequestDTO;
-import com.todai.BE.dto.request.user.SearchUserRequestDTO;
-import com.todai.BE.dto.request.user.TargetEmotionRequestDTO;
-import com.todai.BE.dto.request.user.UpdateShowRangeRequestDTO;
+import com.todai.BE.dto.request.user.*;
 import com.todai.BE.dto.response.diary.EmotionsResponseDto;
 import com.todai.BE.dto.response.user.*;
 import com.todai.BE.security.CustomUserDetails;
@@ -42,7 +39,7 @@ public class UserController {
             @RequestBody SearchUserRequestDTO request
     ) {
         String userCode = request.userCode();
-        SearchUserResponseDTO response = userService.searchUser(userCode);
+        SearchUserResponseDTO response = guardianService.searchUser(userCode);
         return CommonResponseDto.ok(response);
     }
 
@@ -51,7 +48,7 @@ public class UserController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody SearchUserRequestDTO requestDTO
     ) {
-        userService.sendSharingRequest(
+        guardianService.sendSharingRequest(
                 userDetails.getUserId(),
                 requestDTO.userCode()
         );
@@ -129,5 +126,32 @@ public class UserController {
             @RequestBody TargetEmotionRequestDTO requestDTO
             ) {
         return CommonResponseDto.ok(guardianService.getTargetEmotionSummary(user.getUserId(), yearMonth, emotionIndex, requestDTO));
+    }
+
+    @PostMapping("/sharing/sendmessage")
+    public CommonResponseDto<?> sendMessage(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody SendMessageRequestDTO requestDTO
+    ){
+        guardianService.sendMessage(userDetails.getUserId(), requestDTO);
+        return CommonResponseDto.ok(null);
+    }
+
+    @PostMapping("/sharing/message")
+    public CommonResponseDto<GetMessageResponseDTO> getMessage(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody GetMessageRequestDTO requestDTO
+    ) {
+        GetMessageResponseDTO response = userService.getMessage(userDetails.getUserId(), requestDTO.messageId());
+        return CommonResponseDto.ok(response);
+    }
+
+    @PatchMapping("/sharing/notify/read")
+    public CommonResponseDto<?> readSharingNotification(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody ReadSharingNotifyRequestDTO requestDTO
+    ) {
+        guardianService.readSharingNotification(userDetails.getUserId(), requestDTO.sharingNotificationId());
+        return CommonResponseDto.ok(null);
     }
 }

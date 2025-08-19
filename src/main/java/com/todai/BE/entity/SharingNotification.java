@@ -35,5 +35,9 @@ public class SharingNotification extends BaseTimeEntity {
 
     @Column(name = "is_read")
     private Boolean isRead; // 읽음 여부
+
+    public void updateTrue(){
+        this.isRead = true;
+    }
 }
 

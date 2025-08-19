@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.UUID;
 
-public record SendMessageRequestDTO(
-        @JsonProperty("target_user_id") UUID targetId,
-        String content
+public record GetMessageRequestDTO(
+        @JsonProperty("message_id") UUID messageId
 ) {
 }
