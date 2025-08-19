@@ -3,6 +3,8 @@ package com.todai.BE.service;
 import com.todai.BE.common.exception.CustomException;
 import com.todai.BE.common.exception.ErrorCode;
 import com.todai.BE.dto.request.user.TargetEmotionRequestDTO;
+import com.todai.BE.dto.response.diary.EmotionResponseDto;
+import com.todai.BE.dto.response.diary.EmotionSummaryResponseDto;
 import com.todai.BE.dto.response.diary.EmotionsResponseDto;
 import com.todai.BE.dto.response.user.*;
 import com.todai.BE.entity.Diary;
@@ -192,7 +194,66 @@ public class GuardianService {
         );
     }
 
+  
+    public EmotionResponseDto getTargetDayEmotion(UUID userId, LocalDate date, TargetEmotionRequestDTO requestDTO) {
+        //타겟 사용자 아이디
+        UUID targetId = requestDTO.targetId();
+
+        //타겟 유저 존재 여부 검증
+        User owner = userRepository.findById(targetId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_TARGET));
+
+        //연동 관계 존재 여부 검증
+        Sharing sharing = sharingRepository.findByOwner_UserIdAndSharedWith_UserIdAndShareState(targetId, userId, ShareState.MATCHED)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_SHARING));
+
+        Diary diary = diaryRepository.findByUser_UserIdAndDate(targetId, date).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DIARY));
+        List<Double> emotion = diary.getEmotion();
 
 
+        String label = mapToLabel(emotion);
 
+        return new EmotionResponseDto(label, emotion, diary.getSummary(), diary.isMarking());
+    }
+
+    public List<EmotionSummaryResponseDto> getTargetEmotionSummary(UUID userId, YearMonth yearMonth, Long emotionIndex, TargetEmotionRequestDTO requestDTO) {
+        //타겟 사용자 아이디
+        UUID targetId = requestDTO.targetId();
+
+        //타겟 유저 존재 여부 검증
+        User owner = userRepository.findById(targetId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_TARGET));
+
+        //연동 관계 존재 여부 검증
+        Sharing sharing = sharingRepository.findByOwner_UserIdAndSharedWith_UserIdAndShareState(targetId, userId, ShareState.MATCHED)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_SHARING));
+
+        LocalDate start = yearMonth.atDay(1);
+        LocalDate end   = yearMonth.atEndOfMonth();
+
+        List<Diary> diaries = diaryRepository.findAllByUser_UserIdAndDateBetween(targetId, start, end);
+
+        return diaries.stream()
+                .map(diary -> {
+                    List<Double> em = diary.getEmotion();
+
+                    int maxIndex = -1;
+                    double maxValue = Double.NEGATIVE_INFINITY;
+                    for (int i = 0; i < em.size(); i++) {
+                        if (em.get(i) != null && !em.get(i).isNaN() && em.get(i) > maxValue) {
+                            maxValue = em.get(i);
+                            maxIndex = i;
+                        }
+                    }
+
+                    if (emotionIndex == maxIndex) {
+                        String label = mapToLabel(em);
+                        return new EmotionSummaryResponseDto(diary.getDate().toString(), label, diary.getSummary());
+                    } else {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
 }
