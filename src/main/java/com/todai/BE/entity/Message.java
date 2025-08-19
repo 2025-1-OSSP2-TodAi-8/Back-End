@@ -30,8 +30,12 @@ public class Message extends BaseTimeEntity {
     @Column(name = "is_read")
     private Boolean isRead; // 읽음 여부
 
-    // 메세지 작성자
+    //메세지 수령자
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public void updateTrue(){
+        this.isRead = true;
+    }
 }
