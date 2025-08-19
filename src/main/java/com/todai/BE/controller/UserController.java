@@ -100,7 +100,18 @@ public class UserController {
         return CommonResponseDto.ok(response);
     }
 
+    @GetMapping("/guardian/my")
+    public CommonResponseDto<?> getGuardianMyPage(
+            @AuthenticationPrincipal CustomUserDetails user){
+        GuardianMyPageResponseDTO response = guardianService.getGuardianMyPage(user.getUserId());
+        return CommonResponseDto.ok(response);
+    }
 
+    /*@PostMapping("/sharing/sendmessage")
+    public CommonResponseDto<?> sendMessage(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestBody
+    )*/
 
 
 

@@ -60,7 +60,7 @@ public class DiaryService {
         LocalDate start = yearMonth.atDay(1);
         LocalDate end   = yearMonth.atEndOfMonth();
 
-        List<Diary> diaries = diaryRepository.findAllByUser_UserIdAndDateBetween(userId, start, end);
+        List<Diary> diaries = diaryRepository.findAllByUser_UserIdAndDateBetweenOrderByDateAsc(userId, start, end);
 
         return diaries.stream()
                 .map(diary -> {
@@ -77,7 +77,7 @@ public class DiaryService {
     public List<EmotionsResponseDto> getYearEmotion(UUID userId, Year year) {
         LocalDate start = year.atDay(1);
         LocalDate end = year.atMonth(12).atEndOfMonth();
-        List<Diary> diaries = diaryRepository.findAllByUser_UserIdAndDateBetween(userId, start, end);
+        List<Diary> diaries = diaryRepository.findAllByUser_UserIdAndDateBetweenOrderByDateAsc(userId, start, end);
 
         return diaries.stream()
                 .map(diary -> {

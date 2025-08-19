@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface DiaryRepository extends JpaRepository<Diary, UUID> {
-    List<Diary> findAllByUser_UserIdAndDateBetween(
+    List<Diary> findAllByUser_UserIdAndDateBetweenOrderByDateAsc(
             UUID userId,
             LocalDate start,
             LocalDate end
@@ -25,4 +25,10 @@ public interface DiaryRepository extends JpaRepository<Diary, UUID> {
             LocalDate start,
             LocalDate end
     );
+
+    //최근 특정 기간 동안의 감정 데이터 조회
+    List<Diary> findByUserAndDateBetweenOrderByDateDesc(User owner, LocalDate localDate, LocalDate now);
+
+
+
 }
