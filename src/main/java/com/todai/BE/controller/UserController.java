@@ -102,6 +102,12 @@ public class UserController {
         return CommonResponseDto.ok(response);
     }
 
+    @GetMapping("/guardian/my")
+    public CommonResponseDto<?> getGuardianMyPage(
+            @AuthenticationPrincipal CustomUserDetails user){
+        GuardianMyPageResponseDTO response = guardianService.getGuardianMyPage(user.getUserId());
+        return CommonResponseDto.ok(response);
+    }
 
     @PostMapping("/sharing/{date}")
     public CommonResponseDto<?> getTargetDayEmotion(
@@ -112,6 +118,7 @@ public class UserController {
             ) {
         return CommonResponseDto.ok(guardianService.getTargetDayEmotion(user.getUserId(), date, requestDTO));
     }
+
 
     @PostMapping("/sharing/{yearMonth}/{emotion_index}")
     public CommonResponseDto<?> getTargetEmotionSummary(

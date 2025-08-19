@@ -3,6 +3,7 @@ package com.todai.BE.repository;
 import com.todai.BE.entity.ShareState;
 import com.todai.BE.entity.Sharing;
 import com.todai.BE.entity.User;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -24,4 +25,8 @@ public interface SharingRepository extends JpaRepository<Sharing, UUID> {
             UUID sharedWithId,
             ShareState shareState
     );
+
+    //보호자와 연동된 사용자 조회
+    @EntityGraph(attributePaths = {"owner"})
+    List<Sharing> findBySharedWithAndShareState(User sharedWith, ShareState shareState);
 }

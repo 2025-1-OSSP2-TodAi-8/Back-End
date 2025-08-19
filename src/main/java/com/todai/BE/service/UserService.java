@@ -4,10 +4,8 @@ import com.todai.BE.common.exception.CustomException;
 import com.todai.BE.common.exception.ErrorCode;
 import com.todai.BE.dto.request.user.UpdateShowRangeRequestDTO;
 import com.todai.BE.dto.response.user.*;
-import com.todai.BE.entity.ShareRange;
-import com.todai.BE.entity.ShareState;
-import com.todai.BE.entity.Sharing;
-import com.todai.BE.entity.User;
+import com.todai.BE.entity.*;
+import com.todai.BE.repository.SharingNotificationRepository;
 import com.todai.BE.repository.SharingRepository;
 import com.todai.BE.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +21,7 @@ public class UserService {
 
     private final SharingRepository sharingRepository;
     private final UserRepository userRepository;
+    private final SharingNotificationRepository sharingNotificationRepository;
 
     @Transactional(readOnly = true)
     public MyPageResponseDTO getMyPageInfo(UUID userId) {
@@ -115,6 +114,16 @@ public class UserService {
             } else {
                 sharing.reject();
             }
+            
+            //연동 수락/거절 알림 테이블에 데이터 추가
+            SharingNotification notification = SharingNotification.builder()
+                    .sharing(sharing)
+                    .receiver(sharing.getSharedWith())
+                    .state(sharing.getShareState())   //accept → MATCHED, reject → REJECTED
+                    .isRead(false)
+                    .build();
+
+            sharingNotificationRepository.save(notification);
 
             return HandleSharingResponseDTO.of("연동 요청이 " + action + "되었습니다.");
         }
