@@ -2,21 +2,17 @@ package com.todai.BE.service;
 
 import com.todai.BE.common.exception.CustomException;
 import com.todai.BE.common.exception.ErrorCode;
+import com.todai.BE.dto.request.user.SendMessageRequestDTO;
 import com.todai.BE.dto.request.user.TargetEmotionRequestDTO;
 import com.todai.BE.dto.response.diary.EmotionResponseDto;
 import com.todai.BE.dto.response.diary.EmotionSummaryResponseDto;
 import com.todai.BE.dto.response.diary.EmotionsResponseDto;
 import com.todai.BE.dto.response.user.*;
-import com.todai.BE.entity.Diary;
-import com.todai.BE.entity.ShareState;
-import com.todai.BE.entity.Sharing;
-import com.todai.BE.repository.DiaryRepository;
-import com.todai.BE.repository.SharingNotificationRepository;
-import com.todai.BE.repository.SharingRepository;
-import com.todai.BE.repository.UserRepository;
+import com.todai.BE.entity.*;
+import com.todai.BE.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.todai.BE.entity.User;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -34,6 +30,7 @@ public class GuardianService {
     private final SharingRepository sharingRepository;
     private final UserRepository userRepository;
     private final SharingNotificationRepository sharingNotificationRepository;
+    private final MessageRepository messageRepository;
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
@@ -125,11 +122,11 @@ public class GuardianService {
                 .findByReceiverAndIsReadFalseOrderByCreatedAtDesc(user)
                 .stream()
                 .map(s -> new GuardianSharingNotifyDTO(
+                        s.getId(),
                         s.getSharing().getOwner().getName(),
                         s.getState()
                 ))
                 .toList();
-
 
         return GuardianMyPageResponseDTO.from(
                 user.getUsername(),
@@ -139,7 +136,43 @@ public class GuardianService {
                 notifyList,
                 sharingInfo
         );
+    }
 
+    //사용자 유저네임(영문 아이디) 검색 메소드
+    public SearchUserResponseDTO searchUser(String userCode) {
+        User user = userRepository.findByUserCode(userCode)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        return SearchUserResponseDTO.from(user);
+    }
+
+    //보호자 -> 사용자 연동 요청 메소드
+    @Transactional
+    public void sendSharingRequest(UUID requesterId, String targetUserCode) {
+        User requester = userRepository.findById(requesterId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        User target = userRepository.findByUserCode(targetUserCode) //유저코드로 타겟 사용자 검색
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        //이미 요청해서 수락 대기중인 경우
+        if (sharingRepository.existsByOwnerAndSharedWithAndShareState(target, requester, ShareState.UNMATCHED)) {
+            throw new CustomException(ErrorCode.ALREADY_REQUESTED_SHARING);
+        }
+
+        //이미 연동 완료된 경우
+        if (sharingRepository.existsByOwnerAndSharedWithAndShareState(target, requester, ShareState.MATCHED)) {
+            throw new CustomException(ErrorCode.ALREADY_MATCHED_SHARING);
+        }
+
+        Sharing sharing = Sharing.builder()
+                .owner(target)
+                .sharedWith(requester)
+                .shareRange(ShareRange.PARTIAL) // 기본값
+                .shareState(ShareState.UNMATCHED)
+                .build();
+
+        sharingRepository.save(sharing);
     }
 
     //월별 감정 조회
@@ -256,4 +289,42 @@ public class GuardianService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
+
+    //메세지 보내기
+    @Transactional
+    public void sendMessage(UUID userId, SendMessageRequestDTO requestDTO) {
+        User sender = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        User receiver = userRepository.findById(requestDTO.targetId())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        Sharing sharing = sharingRepository.findByOwnerAndSharedWith(receiver, sender)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_SHARING));
+
+        Message message = Message.builder()
+                .content(requestDTO.content())
+                .isRead(false)  //초기 읽음 여부는 false
+                .user(receiver) // 메세지 수령자
+                .sharing(sharing)
+                .build();
+
+        messageRepository.save(message);
+    }
+
+    //연동 수락/거절 알림을 읽음으로 처리
+    @Transactional
+    public void readSharingNotification(UUID userId, UUID notificationId) {
+        User receiver = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        SharingNotification notification = sharingNotificationRepository.findByIdAndReceiver(notificationId, receiver)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_NOTIFICATION));
+
+        //알림 읽음 처리
+        if (!notification.getIsRead()) {
+            notification.updateTrue();
+        }
+    }
+
 }
