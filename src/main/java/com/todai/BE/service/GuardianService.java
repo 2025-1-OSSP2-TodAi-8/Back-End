@@ -231,7 +231,7 @@ public class GuardianService {
         LocalDate start = yearMonth.atDay(1);
         LocalDate end   = yearMonth.atEndOfMonth();
 
-        List<Diary> diaries = diaryRepository.findAllByUser_UserIdAndDateBetween(targetId, start, end);
+        List<Diary> diaries = diaryRepository.findAllByUser_UserIdAndDateBetweenOrderByDateAsc(targetId, start, end);
 
         return diaries.stream()
                 .map(diary -> {
