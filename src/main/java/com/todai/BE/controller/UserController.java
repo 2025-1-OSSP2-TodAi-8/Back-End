@@ -70,7 +70,7 @@ public class UserController {
         return CommonResponseDto.ok(response);
     }
 
-    @PostMapping("/update/showrange")
+    @PatchMapping("/update/showrange")
     public CommonResponseDto<?> updateShowRange(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody UpdateShowRangeRequestDTO requestDTO
