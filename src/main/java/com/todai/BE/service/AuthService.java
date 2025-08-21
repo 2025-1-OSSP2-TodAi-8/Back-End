@@ -3,7 +3,9 @@ package com.todai.BE.service;
 import com.todai.BE.dto.request.user.SignInRequestDTO;
 import com.todai.BE.dto.request.user.SignUpRequestDTO;
 import com.todai.BE.dto.response.user.SignInResponseDTO;
+import com.todai.BE.entity.Gender;
 import com.todai.BE.entity.User;
+import com.todai.BE.entity.UserType;
 import com.todai.BE.repository.UserRepository;
 import com.todai.BE.global.auth.jwt.JwtProvider;
 import com.todai.BE.common.exception.CustomException;
@@ -70,8 +72,9 @@ public class AuthService {
 
         String accessToken = jwtProvider.generateAccessToken(user.getUserId());
         String refreshToken = jwtProvider.generateRefreshToken(user.getUserId());
-        String userType = user.getUserType().toString();
+        UserType userType = user.getUserType();
+        Gender gender = user.getGender();
 
-        return new SignInResponseDTO(accessToken, refreshToken, userType);
+        return new SignInResponseDTO(accessToken, refreshToken, userType, gender);
     }
 }
