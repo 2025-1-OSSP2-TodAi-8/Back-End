@@ -70,7 +70,8 @@ src
 ```
 
 ## API 명세서
-API 명세서 작성한 노션 링크입니다.
+API 명세서 작성한 노션 링크입니다.<br>
+https://www.notion.so/1e7c1107931680f5ada6cac83958bf6e?v=1e7c11079316800ea70a000c6f81e3fc&source=copy_link
 
 
 ---
