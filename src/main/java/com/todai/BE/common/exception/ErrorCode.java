@@ -55,6 +55,7 @@ public enum ErrorCode {
     EMPTY_AUTHENTICATION("40301", HttpStatus.FORBIDDEN, "인증 토큰이 비었습니다."),
     ACCESS_DENIED_LEADER("40301", HttpStatus.FORBIDDEN, "당신은 리더가 아닙니다."),
     INVALID_ROLE("40303", HttpStatus.FORBIDDEN, "권한이 맞지 않습니다."),
+    PRIVATE_CONTENT("40304",HttpStatus.FORBIDDEN, "공개 범위 PARTIAL로는 접근이 불가합니다."),
 
     /**
      * 404** Not Found
