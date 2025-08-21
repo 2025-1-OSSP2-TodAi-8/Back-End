@@ -240,6 +240,11 @@ public class GuardianService {
         Sharing sharing = sharingRepository.findByOwner_UserIdAndSharedWith_UserIdAndShareState(targetId, userId, ShareState.MATCHED)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_SHARING));
 
+        //공개 범위 검증
+        if (sharing.getShareRange() != ShareRange.FULL) {
+            throw new CustomException(ErrorCode.PRIVATE_CONTENT);
+        }        
+        
         Diary diary = diaryRepository.findByUser_UserIdAndDate(targetId, date).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DIARY));
         List<Double> emotion = diary.getEmotion();
 
@@ -260,6 +265,11 @@ public class GuardianService {
         //연동 관계 존재 여부 검증
         Sharing sharing = sharingRepository.findByOwner_UserIdAndSharedWith_UserIdAndShareState(targetId, userId, ShareState.MATCHED)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_SHARING));
+
+        //공개 범위 검증
+        if (sharing.getShareRange() != ShareRange.FULL) {
+            throw new CustomException(ErrorCode.PRIVATE_CONTENT);
+        }
 
         LocalDate start = yearMonth.atDay(1);
         LocalDate end   = yearMonth.atEndOfMonth();
