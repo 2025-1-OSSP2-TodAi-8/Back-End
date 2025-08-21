@@ -35,7 +35,7 @@
 
 프로젝트 업데이트 전에는 **Django**로 전체 백엔드를 구성했으나, 현재는 **Spring Boot**와 **Django** 백엔드를 구성하여 각각의 역할을 분리하여 사용합니다.
 
-<img src="https://github.com/user-attachments/assets/4624c478-c9a5-4d5e-9cff-78954c901737"  width="200" height="400"/>
+<img src="https://github.com/user-attachments/assets/4624c478-c9a5-4d5e-9cff-78954c901737"  width="600"/>
 
 - **Django 서버** → 녹음한 음성 파일을 분석하고 감정을 추출  
 - **Spring Boot 서버** → 사용자 인증, 일기/프로젝트/정원 등 주요 기능 담당  
